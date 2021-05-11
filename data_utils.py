@@ -239,7 +239,7 @@ class TrainingDatasetRoBERTa(TrainingDataset):
 
 
 if __name__ == '__main__':
-    sequence_length = 512
+    sequence_length = 256
     workers = 8
     max_queue_size = 10000
     dict_path = 'pre_models/vocab.txt'
@@ -247,7 +247,7 @@ if __name__ == '__main__':
     tokenizer = Tokenizer(dict_path, do_lower_case=True)
 
     def some_texts():
-        filenames = glob.glob('data/*')
+        filenames = glob.glob('data/ecg*')
         np.random.shuffle(filenames)
         count, texts = 0, []
         for filename in filenames:
@@ -280,7 +280,7 @@ if __name__ == '__main__':
     for i in range(10):  # 数据重复10遍
         TD.process(
             corpus=tqdm(some_texts()),
-            record_name=f'corpus_tfrecord/corpus.{i}.tfrecord',
+            record_name=f'corpus_tfrecord/ecg_corpus.{i}.tfrecord',
             workers=workers,
             max_queue_size=max_queue_size,
         )

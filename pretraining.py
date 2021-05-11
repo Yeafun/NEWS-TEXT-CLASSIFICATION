@@ -1,6 +1,7 @@
 # 预训练脚本
 import os
 os.environ['TF_KERAS'] = '1'  # 必须使用tf.keras
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
 import tensorflow as tf
 from bert4keras.backend import keras, K
@@ -16,13 +17,13 @@ from keras.models import Model
 from data_utils import TrainingDatasetRoBERTa
 
 # 语料路径和模型保存路径
-model_saved_path = 'pre_models/bert_model.ckpt'
+model_saved_path = 'pre_models/bert_ecg_model.ckpt'
 corpus_paths = [
-    f'corpus_tfrecord/corpus.{i}.tfrecord' for i in range(10)
+    f'corpus_tfrecord/ecg_corpus.{i}.tfrecord' for i in range(10)
 ]
 
 # 其他配置
-sequence_length = 512
+sequence_length = 256
 batch_size = 64
 config_path = 'bert_config.json'
 checkpoint_path = None  # 如果从零训练，就设为None
@@ -127,7 +128,7 @@ def build_transformer_model_for_pretraining():
     if checkpoint_path is not None:
         bert.load_weights_from_checkpoint(checkpoint_path)
 
-    return train_model
+    return train_model,bert
 
 
 if tpu_address is None:
@@ -143,7 +144,7 @@ else:
     strategy = tf.distribute.experimental.TPUStrategy(resolver)
 
 with strategy.scope():
-    train_model = build_transformer_model_for_pretraining()
+    train_model,bert = build_transformer_model_for_pretraining()
     train_model.summary()
 
 
@@ -151,7 +152,7 @@ class ModelCheckpoint(keras.callbacks.Callback):
     """自动保存最新模型。"""
     def on_epoch_end(self, epoch, logs=None):
         self.model.save_weights(model_saved_path, overwrite=True)
-
+        bert.save_weights_as_checkpoint(filename='pre_models/bert_ecg_embedding_model_20210428.ckpt')
 
 checkpoint = ModelCheckpoint()  # 保存模型
 csv_logger = keras.callbacks.CSVLogger('training.log')  # 记录日志
@@ -163,3 +164,4 @@ train_model.fit(
     epochs=epochs,
     callbacks=[checkpoint, csv_logger],
 )
+

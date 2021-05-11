@@ -16,7 +16,7 @@ from sklearn.model_selection import StratifiedKFold
 
 # BERT base
 config_path = 'pre_models/bert_config.json'
-checkpoint_path = 'pre_models/bert_model.ckpt'
+checkpoint_path = 'bert_model/bert_ecg_embedding_model.ckpt'
 dict_path = 'pre_models/vocab.txt'
 
 n = 5   # Cross-validation
@@ -325,7 +325,7 @@ def do_train(df_train):
 
 
 if __name__ == '__main__':
-    df_train = pd.read_csv('data/train_set.csv', sep='\t')
+    df_train = pd.read_csv('data/ecg_train.csv', sep='\t')
     df_train['text'] = df_train['text'].apply(lambda x: x.strip().split())
 
     do_train(df_train)

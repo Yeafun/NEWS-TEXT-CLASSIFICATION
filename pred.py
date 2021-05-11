@@ -9,7 +9,7 @@ from keras.layers import *
 
 # BERT base
 config_path = 'pre_models/bert_config.json'
-checkpoint_path = 'pre_models/bert_model.ckpt'
+checkpoint_path = 'pre_models/bert_ecg_embedding_model.ckpt'
 dict_path = 'pre_models/vocab.txt'
 
 n = 5   # Cross-validation
